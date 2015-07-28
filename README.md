@@ -1,2 +1,2 @@
 # retest
-Command-line regular expression tester
+Command-line regular expression tester.
