@@ -24,6 +24,7 @@ fn main() {
     let mut options = Options::new();
     options.optflag("h", "help", "Print this help menu");
     options.optopt("s", "subject", "Specify a subject to match against", "TEXT");
+    options.optflag("o", "matches-only", "Print only the matches and not the entire subject");
     options.optflag("i", "insensitive", "Case-insensitive matching");
     options.optflag("m", "multiline", "Enable multi-line mode: ^ and $ match begin/end of line");
 
@@ -64,5 +65,5 @@ fn main() {
     let subject = subject;
 
     // Print out the highlighted subject.
-    retest::print_matches(&pattern, &subject);
+    retest::print_matches(&pattern, &subject, matches.opt_present("o"));
 }

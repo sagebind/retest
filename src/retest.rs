@@ -3,7 +3,7 @@ use term::{self, color, Terminal};
 
 /// Finds all matches for the given pattern on the given subject and prints out
 /// the subject with matches highlighted.
-pub fn print_matches(pattern: &str, subject: &str) {
+pub fn print_matches(pattern: &str, subject: &str, matches_only: bool) {
     // Attempt to compile the given regex pattern.
     let regex = match Regex::new(&pattern) {
         Ok(result) => { result },
@@ -16,16 +16,26 @@ pub fn print_matches(pattern: &str, subject: &str) {
     // Loop over each match in the subject and pretty-print the match as well as
     // any trailing, non-matching text preceding the match.
     let mut last_index = 0;
+    let mut i = 0;
     for captures in regex.captures_iter(subject) {
         let positions = captures.pos(0).unwrap();
 
-        print!("{}", &subject[last_index .. positions.0]);
+        if !matches_only {
+            print!("{}", &subject[last_index .. positions.0]);
+        } else {
+            print!("#{}: ", i);
+        }
         print_captures(captures);
+        if matches_only {
+            println!("");
+            i += 1;
+        }
+
         last_index = positions.1;
     }
 
     // Print trailing unmatched text if there is any.
-    if last_index < subject.len() {
+    if !matches_only && last_index < subject.len() {
         print!("{}", &subject[last_index ..]);
     }
     println!("");
