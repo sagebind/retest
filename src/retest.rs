@@ -28,6 +28,7 @@ pub fn print_matches(pattern: &str, subject: &str) {
     if last_index < subject.len() {
         print!("{}", &subject[last_index ..]);
     }
+    println!("");
 }
 
 /// Prints out a capture group using color formatting.
