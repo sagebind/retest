@@ -12,6 +12,9 @@ uninstall:
 	@echo Uninstalling from $(PREFIX)/bin...
 	-rm $(PREFIX)/bin/retest
 
+clean:
+	cargo clean
+
 target/release/retest:
 	cargo build --release
 
