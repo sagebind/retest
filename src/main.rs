@@ -24,6 +24,8 @@ fn main() {
     let mut options = Options::new();
     options.optflag("h", "help", "Print this help menu");
     options.optopt("s", "subject", "Specify a subject to match against", "TEXT");
+    options.optflag("i", "insensitive", "Case-insensitive matching");
+    options.optflag("m", "multiline", "Enable multi-line mode: ^ and $ match begin/end of line");
 
     let matches = match options.parse(&args[1..]) {
         Ok(m) => { m }
@@ -37,8 +39,15 @@ fn main() {
         return;
     }
 
-    // Get the regular expression pattern from the argument list.
-    let pattern = matches.free[0].clone();
+    // Get the regular expression pattern from the argument list and add modifiers
+    // if given.
+    let mut pattern = matches.free[0].clone();
+    if matches.opt_present("i") {
+        pattern = "(?i)".to_string() + &pattern;
+    }
+    if matches.opt_present("m") {
+        pattern = "(?m)".to_string() + &pattern;
+    }
 
     // Get the subject to test on. If the -s option is present, get the subject
     // from the argument list, otherwise get the subject from stdin.
