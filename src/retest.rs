@@ -34,46 +34,49 @@ pub fn print_matches(pattern: &str, subject: &str) {
 fn print_captures(captures: Captures) {
     let mut terminal = term::stdout().unwrap();
     let color_cycle = [color::BLUE, color::GREEN, color::MAGENTA, color::YELLOW];
+    let mut color_index = 1;
 
-    // Get the string of the entire match. We will use this to print substrings
-    // as we traverse the capture tree.
+    // Get the string of the entire match and the relative offset in the subject.
     let string = captures.at(0).unwrap();
-    let offsets = captures.pos(0).unwrap();
+    let offset = captures.pos(0).unwrap().0;
 
-    let mut stack: Vec<(usize, usize)> = Vec::new();
-    stack.push(offsets);
-
-    let mut left_bound = 0;
+    // To highlight sub-matches, divide the match string into a series of
+    // resizeable regions that store their range and their color. As we loop
+    // over each capture, find the parent region the current capture group fits
+    // into, and split the region in two, with a new region for the current
+    // capture between it. Worst-case time is O(3n^2), where n is the number of
+    // subgroups in the regular expression.
+    let mut regions: Vec<(usize, usize, u16)> = Vec::new();
+    regions.push((offsets.0, offsets.1, color::BLUE));
 
     for i in 1..captures.len() {
         let pos = captures.pos(i).unwrap();
 
-        if pos.1 <= stack.last().unwrap().1 {
-            // Inside parent
-            terminal.bg(color_cycle[(stack.len() % 4) - 1]).unwrap();
-            print!("{}", &string[stack.last().unwrap().0 - offsets.0 .. pos.0 - offsets.0]);
-            stack.push(pos);
-        } else {
-            left_bound = stack.last().unwrap().0;
-            let right_bound = stack.last().unwrap().1;
+        for j in 0..regions.len() {
+            if pos.0 >= regions[j].0 && pos.1 <= regions[j].1 {
+                // Define two new regions that overlap the old one.
+                let middle = (pos.0, pos.1, color_cycle[color_index]);
+                let right = (pos.1, regions[j].1, regions[j].2);
+                // Shrink the old region to be the leftmost one.
+                regions[j].1 = pos.0;
 
-            // Unwind stack until we find the correct parent.
-            while pos.1 > stack.last().unwrap().1 {
-                stack.pop().unwrap();
-                terminal.bg(color_cycle[stack.len() % 4]).unwrap();
-                print!("{}", &string[left_bound - offsets.0 .. right_bound - offsets.0]);
-                left_bound = right_bound;
+                // Insert the new regions.
+                regions.insert(j + 1, middle);
+                regions.insert(j + 2, right);
+
+                // Choose next color next time.
+                color_index = (color_index + 1) % 4;
+                break;
             }
-
-            terminal.bg(color_cycle[(stack.len() % 4) - 1]).unwrap();
-            print!("{}", &string[right_bound - offsets.0 .. pos.0 - offsets.0]);
-            stack.push(pos);
-            left_bound = pos.0;
         }
     }
 
-    terminal.bg(color_cycle[0]).unwrap();
-    print!("{}", &string[left_bound - offsets.0 .. offsets.1]);
+    // Now print out the prepared regions; this part is pretty easy, since the
+    // region parser already did all the work.
+    for i in 0..regions.len() {
+        terminal.bg(regions[i].2).unwrap();
+        print!("{}", &string[regions[i].0 - offset .. regions[i].1 - offset]);
+    }
 
     // Reset coloring to normal.
     terminal.reset().unwrap();

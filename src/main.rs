@@ -52,6 +52,7 @@ fn main() {
         let mut stdin = io::stdin();
         stdin.read_to_string(&mut subject).unwrap();
     }
+    let subject = subject;
 
     // Print out the highlighted subject.
     retest::print_matches(&pattern, &subject);
