@@ -38,7 +38,7 @@ fn print_captures(captures: Captures) {
 
     // Get the string of the entire match and the relative offset in the subject.
     let string = captures.at(0).unwrap();
-    let offset = captures.pos(0).unwrap().0;
+    let offsets = captures.pos(0).unwrap();
 
     // To highlight sub-matches, divide the match string into a series of
     // resizeable regions that store their range and their color. As we loop
@@ -75,7 +75,7 @@ fn print_captures(captures: Captures) {
     // region parser already did all the work.
     for i in 0..regions.len() {
         terminal.bg(regions[i].2).unwrap();
-        print!("{}", &string[regions[i].0 - offset .. regions[i].1 - offset]);
+        print!("{}", &string[regions[i].0 - offsets.0 .. regions[i].1 - offsets.0]);
     }
 
     // Reset coloring to normal.
