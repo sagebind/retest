@@ -7,8 +7,9 @@ pub fn print_matches(pattern: &str, subject: &str, matches_only: bool) {
     // Attempt to compile the given regex pattern.
     let regex = match Regex::new(&pattern) {
         Ok(result) => { result },
-        Err(_) => {
-            println!("Invalid regular expression pattern '{}'.", pattern);
+        Err(err) => {
+            println!("Invalid regular expression pattern '{}': {}",
+                     pattern, err);
             return;
         }
     };
