@@ -1,49 +1,84 @@
-use regex::{Captures, Regex};
+use regex::{self, Captures, Regex};
+use std::error;
+use std::fmt;
 use term::{self, color, Terminal};
+
+#[derive(Debug)]
+pub enum Error {
+    Regex(regex::Error)
+}
+
+impl error::Error for Error {
+    fn description(&self) -> &str {
+        match *self {
+            Error::Regex(ref err) => err.description()
+        }
+    }
+
+    fn cause(&self) -> Option<&error::Error> {
+        match *self {
+            Error::Regex(ref err) => Some(err)
+        }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Error::Regex(ref err) => write!(f, "Regex error: {}", err)
+        }
+    }
+}
+
+impl From<regex::Error> for Error {
+    fn from(err: regex::Error) -> Error {
+        Error::Regex(err)
+    }
+}
+
+/// Returns an iterator for finding all matches of `pattern` in `subject`.
+pub fn find_matches<'t>(pattern: &str, subject: &'t str) -> Result<Vec<Captures<'t>>, Error> {
+    let regex = try!(Regex::new(&pattern));
+    Ok(regex.captures_iter(subject).collect())
+}
 
 /// Finds all matches for the given pattern on the given subject and prints out
 /// the subject with matches highlighted.
-pub fn print_matches(pattern: &str, subject: &str, matches_only: bool) {
-    // Attempt to compile the given regex pattern.
-    let regex = match Regex::new(&pattern) {
-        Ok(result) => { result },
-        Err(err) => {
-            println!("Invalid regular expression pattern '{}': {}",
-                     pattern, err);
-            return;
-        }
-    };
-
+pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
     // Loop over each match in the subject and pretty-print the match as well as
     // any trailing, non-matching text preceding the match.
     let mut last_index = 0;
-    let mut i = 0;
-    for captures in regex.captures_iter(subject) {
+
+    for captures in matches.iter() {
         let positions = captures.pos(0).unwrap();
 
-        if !matches_only {
-            print!("{}", &subject[last_index .. positions.0]);
-        } else {
-            print!("#{}: ", i);
-        }
-        print_captures(captures);
-        if matches_only {
-            println!("");
-            i += 1;
-        }
+        print!("{}", &subject[last_index .. positions.0]);
+        print_match(captures);
 
         last_index = positions.1;
     }
 
     // Print trailing unmatched text if there is any.
-    if !matches_only && last_index < subject.len() {
+    if last_index < subject.len() {
         print!("{}", &subject[last_index ..]);
     }
     println!("");
 }
 
-/// Prints out a capture group using color formatting.
-fn print_captures(captures: Captures) {
+/// Prints the matches in a list format.
+pub fn print_match_list<'t>(matches: &Vec<Captures<'t>>) {
+    let mut match_id = 1;
+
+    for captures in matches.iter() {
+        print!("{:<4} ", format!("{}.", match_id));
+        print_match(captures);
+        println!("");
+        match_id += 1;
+    }
+}
+
+/// Prints out a match using color formatting.
+fn print_match(captures: &Captures) {
     let mut terminal = term::stdout().unwrap();
     let color_cycle = [color::BLUE, color::GREEN, color::MAGENTA, color::YELLOW];
     let mut color_index = 1;
