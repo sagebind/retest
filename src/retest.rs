@@ -62,7 +62,10 @@ fn print_captures(captures: Captures) {
     regions.push((offsets.0, offsets.1, color::BLUE));
 
     for i in 1..captures.len() {
-        let pos = captures.pos(i).unwrap();
+        let pos = match captures.pos(i) {
+            None => continue,
+            Some(pos) => pos
+        };
 
         for j in 0..regions.len() {
             if pos.0 >= regions[j].0 && pos.1 <= regions[j].1 {
