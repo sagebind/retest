@@ -1,22 +1,25 @@
-PREFIX = /usr/local
+DESTDIR = /
+PREFIX = $(DESTDIR)/usr/local
+PACKAGE_NAME = $(shell grep -m 1 name Cargo.toml | cut -d '"' -f 2)
+PACKAGE_VERSION = $(shell grep -m 1 version Cargo.toml | cut -d '"' -f 2)
 
-release: target/release/retest
+release: target/release/$(PACKAGE_NAME)
 
-debug: target/debug/retest
+debug: target/debug/$(PACKAGE_NAME)
 
 install: release
 	@echo Installing to $(PREFIX)/bin...
-	install -m 0755 target/release/retest $(PREFIX)/bin
+	install -m 0755 target/release/$(PACKAGE_NAME) $(PREFIX)/bin
 
 uninstall:
 	@echo Uninstalling from $(PREFIX)/bin...
-	-rm $(PREFIX)/bin/retest
+	rm $(PREFIX)/bin/$(PACKAGE_NAME)
 
 clean:
-	rm -rf target
+	-rm -rf target
 
-target/release/retest:
+target/release/$(PACKAGE_NAME):
 	cargo build --release
 
-target/debug/retest:
+target/debug/$(PACKAGE_NAME):
 	cargo build
