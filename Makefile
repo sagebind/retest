@@ -13,7 +13,7 @@ uninstall:
 	-rm $(PREFIX)/bin/retest
 
 clean:
-	cargo clean
+	rm -rf target
 
 target/release/retest:
 	cargo build --release
