@@ -70,7 +70,9 @@ pub fn print_match_list<'t>(matches: &Vec<Captures<'t>>) {
     let mut match_id = 1;
 
     for captures in matches.iter() {
-        print!("{:<4} ", format!("{}.", match_id));
+        let positions = captures.pos(0).unwrap();
+
+        print!("{:<4} {:<14} ", format!("{}.", match_id), format!("[{}-{}]", positions.0, positions.1));
         print_match(captures);
         println!("");
         match_id += 1;
