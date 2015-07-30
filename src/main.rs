@@ -9,6 +9,8 @@ use std::io;
 use std::io::Read;
 use std::process;
 
+const VERSION: &'static str = "0.2.0";
+
 /// Prints the program usage to the console.
 fn print_usage(options: Options) {
     let brief = "Usage: retest REGEX [options]
@@ -24,6 +26,7 @@ fn main() {
 
     let mut options = Options::new();
     options.optflag("h", "help", "Print this help menu");
+    options.optflag("v", "version", "Print the program version");
     options.optopt("s", "subject", "Specify a subject to match against", "TEXT");
     options.optflag("l", "list", "Print the matches as a list instead of inside the entire subject");
     options.optflag("i", "insensitive", "Case-insensitive matching");
@@ -36,6 +39,12 @@ fn main() {
             process::exit(1);
         }
     };
+
+    // If the version flag is present, display the version info and exit.
+    if opt_matches.opt_present("v") {
+        println!("Retest version {}.", VERSION);
+        return;
+    }
 
     // If the help flag is present or the user forgot to specify a pattern, show
     // the usage message.
