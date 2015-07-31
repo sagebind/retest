@@ -53,7 +53,7 @@ pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>)
         let positions = captures.pos(0).unwrap();
 
         print!("{}", &subject[last_index .. positions.0]);
-        print_match(captures);
+        print_match(&subject, captures);
 
         last_index = positions.1;
     }
@@ -66,68 +66,84 @@ pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>)
 }
 
 /// Prints the matches in a list format.
-pub fn print_match_list<'t>(matches: &Vec<Captures<'t>>) {
+pub fn print_match_list<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
     let mut match_id = 1;
 
     for captures in matches.iter() {
         let positions = captures.pos(0).unwrap();
 
         print!("{:<4} {:<14} ", format!("{}.", match_id), format!("[{}-{}]", positions.0, positions.1));
-        print_match(captures);
+        print_match(&subject, captures);
         println!("");
         match_id += 1;
     }
 }
 
 /// Prints out a match using color formatting.
-fn print_match(captures: &Captures) {
+///
+/// The match is highlighted according to the captures that are matched. Each
+/// capture is highlighted in a different color to distinguish it from other
+/// captures. Because captures can be nested, this function uses a stack to keep
+/// track of capture scope and display nested captures correctly.
+///
+/// The worst-case run time is O(2n), but the average run time should be more
+/// like Θ(n + log(n)). The more nested the captures are, the worse the run time
+/// is.
+fn print_match(subject: &str, captures: &Captures) {
     let mut terminal = term::stdout().unwrap();
     let color_cycle = [color::BLUE, color::GREEN, color::MAGENTA, color::YELLOW];
-    let mut color_index = 1;
+    let mut color_index = 0;
 
-    // Get the string of the entire match and the relative offset in the subject.
-    let string = captures.at(0).unwrap();
-    let offsets = captures.pos(0).unwrap();
+    // To highlight the captures in a context-sensitive manner, set up a stack
+    // to keep track of entering and exiting capture scopes. When examining a
+    // capture, check if it fits inside the parent capture. If it doesn't, close
+    // the scopes until we find a scope the capture does fit in.
+    let mut stack: Vec<(usize, usize, u16)> = Vec::new();
 
-    // To highlight sub-matches, divide the match string into a series of
-    // resizeable regions that store their range and their color. As we loop
-    // over each capture, find the parent region the current capture group fits
-    // into, and split the region in two, with a new region for the current
-    // capture between it. Worst-case time is O(3n^2), where n is the number of
-    // subgroups in the regular expression.
-    let mut regions: Vec<(usize, usize, u16)> = Vec::new();
-    regions.push((offsets.0, offsets.1, color::BLUE));
+    // Since we will print the captures as we go along, set up a cursor that
+    // points to how much of the string we have printed out so far so we don't
+    // accidentally print out the same regions of the strings more than once.
+    let mut string_cursor = captures.pos(0).unwrap().0;
 
-    for i in 1..captures.len() {
+    // Loop over each capture and find the scope it belongs to. Optional capture
+    // groups that are not matched are ignored.
+    for i in 0..captures.len() {
         let pos = match captures.pos(i) {
             None => continue,
             Some(pos) => pos
         };
 
-        for j in 0..regions.len() {
-            if pos.0 >= regions[j].0 && pos.1 <= regions[j].1 {
-                // Define two new regions that overlap the old one.
-                let middle = (pos.0, pos.1, color_cycle[color_index]);
-                let right = (pos.1, regions[j].1, regions[j].2);
-                // Shrink the old region to be the leftmost one.
-                regions[j].1 = pos.0;
+        // Unwind the stack until we find the correct parent.
+        while !stack.is_empty() && pos.1 > stack.last().unwrap().1 {
+            let scope = stack.pop().unwrap();
 
-                // Insert the new regions.
-                regions.insert(j + 1, middle);
-                regions.insert(j + 2, right);
-
-                // Choose next color next time.
-                color_index = (color_index + 1) % 4;
-                break;
-            }
+            terminal.bg(scope.2).unwrap();
+            print!("{}", &subject[string_cursor .. scope.1]);
+            string_cursor = scope.1;
         }
+
+        // If the stack isn't empty, print out the head end of the parent scope
+        // just before the current capture.
+        if !stack.is_empty() {
+            terminal.bg(stack.last().unwrap().2).unwrap();
+            print!("{}", &subject[string_cursor .. pos.0]);
+            string_cursor = pos.0;
+        }
+
+        // Push the current capture onto the stack with a color selected from
+        // the color cycle.
+        stack.push((pos.0, pos.1, color_cycle[color_index]));
+        color_index = (color_index + 1) % color_cycle.len();
     }
 
-    // Now print out the prepared regions; this part is pretty easy, since the
-    // region parser already did all the work.
-    for i in 0..regions.len() {
-        terminal.bg(regions[i].2).unwrap();
-        print!("{}", &string[regions[i].0 - offsets.0 .. regions[i].1 - offsets.0]);
+    // Finally, print out the tail of the match. The stack will still have
+    // captures in it for the very last capture and its ancestors, so unwind the
+    // stack one last time and print out each capture's tail.
+    while !stack.is_empty() {
+        let scope = stack.pop().unwrap();
+        terminal.bg(scope.2).unwrap();
+        print!("{}", &subject[string_cursor .. scope.1]);
+        string_cursor = scope.1;
     }
 
     // Reset coloring to normal.

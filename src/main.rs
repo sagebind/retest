@@ -88,7 +88,7 @@ fn main() {
 
     // If the -l flag is given, print out the matches as a list instead.
     if opt_matches.opt_present("l") {
-        retest::print_match_list(&matches);
+        retest::print_match_list(&subject, &matches);
     } else {
         retest::print_subject_highlighted(&subject, &matches);
     }
