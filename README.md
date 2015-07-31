@@ -1,6 +1,12 @@
 # retest
 Retest is a regular expression tester that can be used in the terminal. It is meant to be a simple and quick utility to aid you in developing regular expressions. Like [regular expressions 101](https://regex101.com), but in the terminal.
 
+## Features
+- **Piping!** You can pipe a subject string to match against into standard input.
+- **Nested highlighting!** If the regular expression contains groups and subgroups, they will be highlighted in different colors than the whole match.
+- **All matches!** Retest finds all non-crossing matches in the subject string.
+- **List of matches!** You can optionally display all matches as a formatted list, which includes the match order and the indexes in the string.
+
 Would you like to suggest new features? [Make an issue on GitHub](https://github.com/coderstephen/retest/issues/new) describing the feature, or [shoot me an email](mailto:me@stephencoakley.com) to ask me directly.
 
 ## Install from release
