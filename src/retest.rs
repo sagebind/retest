@@ -36,14 +36,15 @@ impl From<regex::Error> for Error {
     }
 }
 
-/// Returns an iterator for finding all matches of `pattern` in `subject`.
+/// Finds all matches for the given pattern on the given subject and returns
+/// the matches and their captures.
 pub fn find_matches<'t>(pattern: &str, subject: &'t str) -> Result<Vec<Captures<'t>>, Error> {
     let regex = try!(Regex::new(&pattern));
     Ok(regex.captures_iter(subject).collect())
 }
 
-/// Finds all matches for the given pattern on the given subject and prints out
-/// the subject with matches highlighted.
+/// Prints out the given subject string, with the regions in the given matches
+/// highlighted.
 pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
     // Loop over each match in the subject and pretty-print the match as well as
     // any trailing, non-matching text preceding the match.
@@ -65,7 +66,7 @@ pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>)
     println!("");
 }
 
-/// Prints the matches in a list format.
+/// Prints the given matches in a formatted list.
 pub fn print_match_list<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
     let mut match_id = 1;
 
@@ -86,9 +87,9 @@ pub fn print_match_list<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
 /// captures. Because captures can be nested, this function uses a stack to keep
 /// track of capture scope and display nested captures correctly.
 ///
-/// The worst-case run time is O(2n), but the average run time should be more
-/// like Θ(n + log(n)). The more nested the captures are, the worse the run time
-/// is.
+/// The worst-case run time is O(2n log(n)), but the average run time should be
+/// more like Θ(n + log(n)). The more nested the captures are, the worse the run
+/// time is.
 fn print_match(subject: &str, captures: &Captures) {
     let mut terminal = term::stdout().unwrap();
     let color_cycle = [color::BLUE, color::GREEN, color::MAGENTA, color::YELLOW];
