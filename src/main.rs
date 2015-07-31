@@ -9,7 +9,7 @@ use std::io;
 use std::io::Read;
 use std::process;
 
-const VERSION: &'static str = "0.2.0";
+const VERSION: &'static str = "0.2.1";
 
 /// Prints the program usage to the console.
 fn print_usage(options: Options) {
