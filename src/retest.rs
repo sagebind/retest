@@ -117,7 +117,6 @@ fn print_match(subject: &str, captures: &Captures) {
         // Unwind the stack until we find the correct parent.
         while !stack.is_empty() && pos.1 > stack.last().unwrap().1 {
             let scope = stack.pop().unwrap();
-
             terminal.bg(scope.2).unwrap();
             print!("{}", &subject[string_cursor .. scope.1]);
             string_cursor = scope.1;
