@@ -8,13 +8,16 @@ pub enum Error {
     Regex(regex::Error)
 }
 
+/// Implement the standard error methods.
 impl error::Error for Error {
+    /// Gets the error description.
     fn description(&self) -> &str {
         match *self {
             Error::Regex(ref err) => err.description()
         }
     }
 
+    /// Gets a previous error object, if any.
     fn cause(&self) -> Option<&error::Error> {
         match *self {
             Error::Regex(ref err) => Some(err)
@@ -22,6 +25,7 @@ impl error::Error for Error {
     }
 }
 
+/// Implement display formatting for the error type.
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
@@ -30,6 +34,7 @@ impl fmt::Display for Error {
     }
 }
 
+/// Implement casting from other error types.
 impl From<regex::Error> for Error {
     fn from(err: regex::Error) -> Error {
         Error::Regex(err)

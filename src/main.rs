@@ -65,7 +65,6 @@ fn main() {
 
     // Get the subject to test on. If the -s option is present, get the subject
     // from the argument list, otherwise get the subject from stdin.
-    // Get the input text from stdin.
     let mut subject: String;
 
     if opt_matches.opt_present("s") {
