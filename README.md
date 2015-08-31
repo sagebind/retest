@@ -1,6 +1,8 @@
 # retest
 Retest is a regular expression tester that can be used in the terminal. It is meant to be a simple and quick utility to aid you in developing regular expressions. Like [regular expressions 101](https://regex101.com), but in the terminal.
 
+[![Build Status](https://img.shields.io/travis/coderstephen/retest.svg)](https://travis-ci.org/coderstephen/retest)
+
 ## Features
 - **Piping!** You can pipe a subject string to match against into standard input.
 - **Nested highlighting!** If the regular expression contains groups and subgroups, they will be highlighted in different colors than the whole match.
