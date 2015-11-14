@@ -1,0 +1,6 @@
+retest: arch-dependent-file-in-usr-share
+retest: changelog-file-missing-in-native-package
+retest: copyright-file-contains-full-apache-2-license
+retest: copyright-should-refer-to-common-license-file-for-apache-2
+retest: embedded-library
+retest: unstripped-binary-or-object

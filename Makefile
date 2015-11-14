@@ -23,3 +23,7 @@ target/release/$(PACKAGE_NAME):
 
 target/debug/$(PACKAGE_NAME):
 	cargo build
+
+deb: release
+	docker build -f build/debian/Dockerfile -t retest/build-debian .
+	docker run -it --rm -v $(shell pwd):/source retest/build-debian $(PACKAGE_NAME) $(PACKAGE_VERSION) $(shell uname -m) build/debian/control.in $(shell wc -c < target/release/retest) target/release

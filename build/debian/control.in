@@ -1,0 +1,11 @@
+Package: retest
+Version: @version
+Depends: libc6
+Recommends: lsb-release
+Section: devel
+Priority: optional
+Architecture: @arch
+Installed-Size: @installedSize
+Maintainer: Stephen Coakley <me@stephencoakley.com>
+Description: Regular expression tester
+ A simple and quick regular expression tester in the terminal.
