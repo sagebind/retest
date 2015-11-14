@@ -3,9 +3,12 @@ PREFIX = $(DESTDIR)/usr/local
 PACKAGE_NAME = $(shell grep -m 1 name Cargo.toml | cut -d '"' -f 2)
 PACKAGE_VERSION = $(shell grep -m 1 version Cargo.toml | cut -d '"' -f 2)
 
-release: target/release/$(PACKAGE_NAME)
 
-debug: target/debug/$(PACKAGE_NAME)
+debug:
+	cargo build
+
+release:
+	cargo build --release
 
 install: release
 	@echo Installing to $(PREFIX)/bin...
@@ -17,12 +20,6 @@ uninstall:
 
 clean:
 	-rm -rf target
-
-target/release/$(PACKAGE_NAME):
-	cargo build --release
-
-target/debug/$(PACKAGE_NAME):
-	cargo build
 
 deb: release
 	docker build -f build/debian/Dockerfile -t retest/build-debian .

@@ -5,6 +5,7 @@ mod retest;
 
 use getopts::Options;
 use std::env;
+use std::fs;
 use std::io;
 use std::io::Read;
 use std::process;
@@ -27,6 +28,7 @@ fn main() {
     let mut options = Options::new();
     options.optflag("h", "help", "Print this help menu");
     options.optflag("v", "version", "Print the program version");
+    options.optopt("f", "file", "Specify a file to match against", "FILE");
     options.optopt("s", "subject", "Specify a subject to match against", "TEXT");
     options.optflag("l", "list", "Print the matches as a list instead of inside the entire subject");
     options.optflag("i", "insensitive", "Case-insensitive matching");
@@ -64,15 +66,28 @@ fn main() {
     }
 
     // Get the subject to test on. If the -s option is present, get the subject
-    // from the argument list, otherwise get the subject from stdin.
+    // from the argument list. If the -f option is present, read the subject from
+    // a file. Otherwise get the subject from stdin.
     let mut subject: String;
 
     if opt_matches.opt_present("s") {
         subject = opt_matches.opt_str("s").unwrap();
     } else {
         subject = String::new();
-        let mut stdin = io::stdin();
-        stdin.read_to_string(&mut subject).unwrap();
+
+        if opt_matches.opt_present("f") {
+            let mut file = match fs::File::open(opt_matches.opt_str("f").unwrap()) {
+                Ok(file) => { file },
+                Err(err) => {
+                    println!("ERROR: {}", err);
+                    process::exit(1);
+                }
+            };
+            file.read_to_string(&mut subject).unwrap();
+        } else {
+            let mut stdin = io::stdin();
+            stdin.read_to_string(&mut subject).unwrap();
+        }
     }
     let subject = subject;
 
