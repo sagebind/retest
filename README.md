@@ -50,5 +50,8 @@ For more options and tricks, check the help message from the program:
 
     $ retest --help
 
+## Where to get help
+Need help? Just [send me an email](mailto:me@stephencoakley.com) with your questions. Be sure to add "Slack client" to the message subject line so I know how I can help you out.
+
 ## License
 All documentation and source code is licensed under the Apache License, Version 2.0 (Apache-2.0). See the [LICENSE](LICENSE) file for details.
