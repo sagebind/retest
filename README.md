@@ -1,7 +1,7 @@
 # retest
 Retest is a regular expression tester that can be used in the terminal. It is meant to be a simple and quick utility to aid you in developing regular expressions. Like [regular expressions 101](https://regex101.com), but in the terminal.
 
-[![Build Status](https://img.shields.io/travis/coderstephen/retest.svg)](https://travis-ci.org/coderstephen/retest)
+[![Build Status](https://img.shields.io/travis/sagebind/retest.svg)](https://travis-ci.org/sagebind/retest)
 
 ## Features
 - **Piping!** You can pipe a subject string to match against into standard input.
@@ -9,15 +9,15 @@ Retest is a regular expression tester that can be used in the terminal. It is me
 - **All matches!** Retest finds all non-crossing matches in the subject string.
 - **List of matches!** You can optionally display all matches as a formatted list, which includes the match order and the indexes in the string.
 
-Would you like to suggest new features? [Make an issue on GitHub](https://github.com/coderstephen/retest/issues/new) describing the feature, or [shoot me an email](mailto:me@stephencoakley.com) to ask me directly.
+Would you like to suggest new features? [Make an issue on GitHub](https://github.com/sagebind/retest/issues/new) describing the feature, or [shoot me an email](mailto:me@stephencoakley.com) to ask me directly.
 
 ## Install from release
-Binaries for Linux are provided for each release and available on the [releases page](https://github.com/coderstephen/retest/releases). Just download a "retest" binary and place it somewhere that is in your $PATH (like `/usr/local/bin`), and you're ready to go.
+Binaries for Linux are provided for each release and available on the [releases page](https://github.com/sagebind/retest/releases). Just download a "retest" binary and place it somewhere that is in your $PATH (like `/usr/local/bin`), and you're ready to go.
 
 ## Compiling and installing from source
 First, get the source code by cloning from GitHub:
 
-    $ git clone https://github.com/coderstephen/retest.git
+    $ git clone https://github.com/sagebind/retest.git
     $ cd retest
 
 You can install dependencies and compile all at once using `cargo`:

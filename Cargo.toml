@@ -1,7 +1,7 @@
 [package]
 name = "retest"
 version = "0.2.2"
-authors = ["coderstephen <me@stephencoakley.com>"]
+authors = ["Stephen Coakley <me@stephencoakley.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 
