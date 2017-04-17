@@ -38,7 +38,7 @@ Retest accepts one regular expression as an argument, and then matches it agains
 
     $ echo 'fee fi fo fum' | retest 'f\w\w'
 
-will output something like the following (text in square brackets would be highlighted):
+Will output something like the following (text in square brackets would be highlighted):
 
     [fee] fi fo [fum]
 
