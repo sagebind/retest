@@ -5,7 +5,8 @@ use term::{self, color};
 
 #[derive(Debug)]
 pub enum Error {
-    Regex(regex::Error)
+    Regex(regex::Error),
+    Other(String),
 }
 
 /// Implement the standard error methods.
@@ -13,14 +14,16 @@ impl error::Error for Error {
     /// Gets the error description.
     fn description(&self) -> &str {
         match *self {
-            Error::Regex(ref err) => err.description()
+            Error::Regex(ref err) => err.description(),
+            Error::Other(ref err) => err,
         }
     }
 
     /// Gets a previous error object, if any.
     fn cause(&self) -> Option<&error::Error> {
         match *self {
-            Error::Regex(ref err) => Some(err)
+            Error::Regex(ref err) => Some(err),
+            Error::Other(_) => None,
         }
     }
 }
@@ -29,7 +32,8 @@ impl error::Error for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::Regex(ref err) => write!(f, "Regex error: {}", err)
+            Error::Regex(ref err) => write!(f, "regex error: {}", err),
+            Error::Other(ref err) => write!(f, "{}", err),
         }
     }
 }
@@ -38,6 +42,12 @@ impl fmt::Display for Error {
 impl From<regex::Error> for Error {
     fn from(err: regex::Error) -> Error {
         Error::Regex(err)
+    }
+}
+
+impl From<&'static str> for Error {
+    fn from(err: &'static str) -> Error {
+        Error::Other(err.into())
     }
 }
 
@@ -50,7 +60,7 @@ pub fn find_matches<'t>(pattern: &str, subject: &'t str) -> Result<Vec<Captures<
 
 /// Prints out the given subject string, with the regions in the given matches
 /// highlighted.
-pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
+pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>) -> Result<(), Error> {
     // Loop over each match in the subject and pretty-print the match as well as
     // any trailing, non-matching text preceding the match.
     let mut last_index = 0;
@@ -59,7 +69,7 @@ pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>)
         let positions = captures.get(0).unwrap();
 
         print!("{}", &subject[last_index .. positions.start()]);
-        print_match(&subject, captures);
+        print_match(&subject, captures)?;
 
         last_index = positions.end();
     }
@@ -69,20 +79,24 @@ pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>)
         print!("{}", &subject[last_index ..]);
     }
     println!("");
+
+    Ok(())
 }
 
 /// Prints the given matches in a formatted list.
-pub fn print_match_list<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
+pub fn print_match_list<'t>(subject: &str, matches: &Vec<Captures<'t>>) -> Result<(), Error> {
     let mut match_id = 1;
 
     for captures in matches.iter() {
         let positions = captures.get(0).unwrap();
 
         print!("{:<4} {:<14} ", format!("{}.", match_id), format!("[{}-{}]", positions.start(), positions.end()));
-        print_match(&subject, captures);
+        print_match(&subject, captures)?;
         println!("");
         match_id += 1;
     }
+
+    Ok(())
 }
 
 /// Prints out a match using color formatting.
@@ -95,8 +109,11 @@ pub fn print_match_list<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
 /// The worst-case run time is O(2n log(n)), but the average run time should be
 /// more like Θ(n + log(n)). The more nested the captures are, the worse the run
 /// time is.
-fn print_match(subject: &str, captures: &Captures) {
-    let mut terminal = term::stdout().unwrap();
+fn print_match(subject: &str, captures: &Captures) -> Result<(), Error> {
+    let mut terminal = match term::stdout() {
+        Some(t) => t,
+        None => return Err(Error::from("could not open terminal display")),
+    };
     let color_cycle = [color::BLUE, color::GREEN, color::MAGENTA, color::YELLOW];
     let mut color_index = 0;
 
@@ -153,4 +170,6 @@ fn print_match(subject: &str, captures: &Captures) {
 
     // Reset coloring to normal.
     terminal.reset().unwrap();
+
+    Ok(())
 }

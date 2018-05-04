@@ -37,7 +37,7 @@ fn main() {
     let opt_matches = match options.parse(&args[1..]) {
         Ok(matches) => { matches }
         Err(err) => {
-            println!("ERROR: {}", err);
+            eprintln!("ERROR: {}", err);
             process::exit(1);
         }
     };
@@ -79,7 +79,7 @@ fn main() {
             let mut file = match fs::File::open(opt_matches.opt_str("f").unwrap()) {
                 Ok(file) => { file },
                 Err(err) => {
-                    println!("ERROR: {}", err);
+                    eprintln!("ERROR: {}", err);
                     process::exit(1);
                 }
             };
@@ -95,15 +95,21 @@ fn main() {
     let matches = match retest::find_matches(&pattern, &subject) {
         Ok(result) => { result },
         Err(err) => {
-            println!("ERROR: {}", err);
+            eprintln!("ERROR: {}", err);
             process::exit(1);
         }
     };
 
     // If the -l flag is given, print out the matches as a list instead.
     if opt_matches.opt_present("l") {
-        retest::print_match_list(&subject, &matches);
+        if let Err(e) = retest::print_match_list(&subject, &matches) {
+            eprintln!("ERROR: {}", e);
+            process::exit(1);
+        }
     } else {
-        retest::print_subject_highlighted(&subject, &matches);
+        if let Err(e) = retest::print_subject_highlighted(&subject, &matches) {
+            eprintln!("ERROR: {}", e);
+            process::exit(1);
+        }
     }
 }
