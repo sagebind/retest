@@ -1,7 +1,7 @@
 use regex::{self, Captures, Regex};
 use std::error;
 use std::fmt;
-use term::{self, color, Terminal};
+use term::{self, color};
 
 #[derive(Debug)]
 pub enum Error {
@@ -56,12 +56,12 @@ pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>)
     let mut last_index = 0;
 
     for captures in matches.iter() {
-        let positions = captures.pos(0).unwrap();
+        let positions = captures.get(0).unwrap();
 
-        print!("{}", &subject[last_index .. positions.0]);
+        print!("{}", &subject[last_index .. positions.start()]);
         print_match(&subject, captures);
 
-        last_index = positions.1;
+        last_index = positions.end();
     }
 
     // Print trailing unmatched text if there is any.
@@ -76,9 +76,9 @@ pub fn print_match_list<'t>(subject: &str, matches: &Vec<Captures<'t>>) {
     let mut match_id = 1;
 
     for captures in matches.iter() {
-        let positions = captures.pos(0).unwrap();
+        let positions = captures.get(0).unwrap();
 
-        print!("{:<4} {:<14} ", format!("{}.", match_id), format!("[{}-{}]", positions.0, positions.1));
+        print!("{:<4} {:<14} ", format!("{}.", match_id), format!("[{}-{}]", positions.start(), positions.end()));
         print_match(&subject, captures);
         println!("");
         match_id += 1;
@@ -104,23 +104,23 @@ fn print_match(subject: &str, captures: &Captures) {
     // to keep track of entering and exiting capture scopes. When examining a
     // capture, check if it fits inside the parent capture. If it doesn't, close
     // the scopes until we find a scope the capture does fit in.
-    let mut stack: Vec<(usize, usize, u16)> = Vec::new();
+    let mut stack: Vec<(usize, usize, u32)> = Vec::new();
 
     // Since we will print the captures as we go along, set up a cursor that
     // points to how much of the string we have printed out so far so we don't
     // accidentally print out the same regions of the strings more than once.
-    let mut string_cursor = captures.pos(0).unwrap().0;
+    let mut string_cursor = captures.get(0).unwrap().start();
 
     // Loop over each capture and find the scope it belongs to. Optional capture
     // groups that are not matched are ignored.
     for i in 0..captures.len() {
-        let pos = match captures.pos(i) {
+        let pos = match captures.get(i) {
             None => continue,
             Some(pos) => pos
         };
 
         // Unwind the stack until we find the correct parent.
-        while !stack.is_empty() && pos.1 > stack.last().unwrap().1 {
+        while !stack.is_empty() && pos.end() > stack.last().unwrap().1 {
             let scope = stack.pop().unwrap();
             terminal.bg(scope.2).unwrap();
             print!("{}", &subject[string_cursor .. scope.1]);
@@ -131,13 +131,13 @@ fn print_match(subject: &str, captures: &Captures) {
         // just before the current capture.
         if !stack.is_empty() {
             terminal.bg(stack.last().unwrap().2).unwrap();
-            print!("{}", &subject[string_cursor .. pos.0]);
-            string_cursor = pos.0;
+            print!("{}", &subject[string_cursor .. pos.start()]);
+            string_cursor = pos.start();
         }
 
         // Push the current capture onto the stack with a color selected from
         // the color cycle.
-        stack.push((pos.0, pos.1, color_cycle[color_index]));
+        stack.push((pos.start(), pos.end(), color_cycle[color_index]));
         color_index = (color_index + 1) % color_cycle.len();
     }
 
