@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "retest"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "getopts 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
