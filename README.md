@@ -1,7 +1,7 @@
 # retest
 Retest is a regular expression tester that can be used in the terminal. It is meant to be a simple and quick utility to aid you in developing regular expressions. Like [regular expressions 101](https://regex101.com), but in the terminal.
 
-[![Shippable](https://img.shields.io/shippable/59f4fe46e07b7707001812ad.svg)](https://app.shippable.com/github/sagebind/retest)
+[![Build Status](https://semaphoreci.com/api/v1/sagebind/retest/branches/master/badge.svg)](https://semaphoreci.com/sagebind/retest)
 
 ## Features
 - **Piping!** You can pipe a subject string to match against into standard input.
