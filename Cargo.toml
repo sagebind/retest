@@ -1,9 +1,13 @@
 [package]
 name = "retest"
 version = "0.2.3"
-authors = ["Stephen Coakley <me@stephencoakley.com>"]
+description = "Command-line regular expression tester"
+authors = ["Stephen M. Coakley <me@stephencoakley.com>"]
 license = "Apache-2.0"
+keywords = ["regex", "pattern"]
+categories = ["command-line-utilities", "text-processing"]
 readme = "README.md"
+repository = "https://github.com/sagebind/retest"
 
 [dependencies]
 getopts = "0.2"
