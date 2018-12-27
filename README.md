@@ -1,9 +1,9 @@
 # retest
+
 Retest is a regular expression tester that can be used in the terminal. It is meant to be a simple and quick utility to aid you in developing regular expressions. Like [regular expressions 101](https://regex101.com), but in the terminal.
 
-[![Build Status](https://semaphoreci.com/api/v1/sagebind/retest/branches/master/badge.svg)](https://semaphoreci.com/sagebind/retest)
-
 ## Features
+
 - **Piping!** You can pipe a subject string to match against into standard input.
 - **Nested highlighting!** If the regular expression contains groups and subgroups, they will be highlighted in different colors than the whole match.
 - **All matches!** Retest finds all non-crossing matches in the subject string.
@@ -12,9 +12,11 @@ Retest is a regular expression tester that can be used in the terminal. It is me
 Would you like to suggest new features? [Make an issue on GitHub](https://github.com/sagebind/retest/issues/new) describing the feature, or [shoot me an email](mailto:me@stephencoakley.com) to ask me directly.
 
 ## Install from release
+
 Binaries for Linux are provided for each release and available on the [releases page](https://github.com/sagebind/retest/releases). Just download a "retest" binary and place it somewhere that is in your $PATH (like `/usr/local/bin`), and you're ready to go.
 
 ## Compiling and installing from source
+
 First, get the source code by cloning from GitHub:
 
     $ git clone https://github.com/sagebind/retest.git
@@ -34,6 +36,7 @@ This will compile retest and place a globally available executable into `/usr/lo
     $ sudo make uninstall
 
 ## Usage
+
 Retest accepts one regular expression as an argument, and then matches it against a subject string. The subject will be printed back out, with all matches found highlighted. For example:
 
     $ echo 'fee fi fo fum' | retest 'f\w\w'
@@ -51,7 +54,9 @@ For more options and tricks, check the help message from the program:
     $ retest --help
 
 ## Where to get help
+
 Need help? Just [send me an email](mailto:me@stephencoakley.com) with your questions. Be sure to add "retest" to the message subject line so I know how I can help you out.
 
 ## License
+
 All documentation and source code is licensed under the Apache License, Version 2.0 (Apache-2.0). See the [LICENSE](LICENSE) file for details.
