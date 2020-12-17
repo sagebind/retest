@@ -30,12 +30,20 @@ fn main() {
     options.optflag("v", "version", "Print the program version");
     options.optopt("f", "file", "Specify a file to match against", "FILE");
     options.optopt("s", "subject", "Specify a subject to match against", "TEXT");
-    options.optflag("l", "list", "Print the matches as a list instead of inside the entire subject");
+    options.optflag(
+        "l",
+        "list",
+        "Print the matches as a list instead of inside the entire subject",
+    );
     options.optflag("i", "insensitive", "Case-insensitive matching");
-    options.optflag("m", "multiline", "Enable multi-line mode: ^ and $ match begin/end of line");
+    options.optflag(
+        "m",
+        "multiline",
+        "Enable multi-line mode: ^ and $ match begin/end of line",
+    );
 
     let opt_matches = match options.parse(&args[1..]) {
-        Ok(matches) => { matches }
+        Ok(matches) => matches,
         Err(err) => {
             eprintln!("ERROR: {}", err);
             process::exit(1);
@@ -77,7 +85,7 @@ fn main() {
 
         if opt_matches.opt_present("f") {
             let mut file = match fs::File::open(opt_matches.opt_str("f").unwrap()) {
-                Ok(file) => { file },
+                Ok(file) => file,
                 Err(err) => {
                     eprintln!("ERROR: {}", err);
                     process::exit(1);
@@ -93,7 +101,7 @@ fn main() {
 
     // Find all matches in the subject.
     let matches = match retest::find_matches(&pattern, &subject) {
-        Ok(result) => { result },
+        Ok(result) => result,
         Err(err) => {
             eprintln!("ERROR: {}", err);
             process::exit(1);

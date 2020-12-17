@@ -60,7 +60,10 @@ pub fn find_matches<'t>(pattern: &str, subject: &'t str) -> Result<Vec<Captures<
 
 /// Prints out the given subject string, with the regions in the given matches
 /// highlighted.
-pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>) -> Result<(), Error> {
+pub fn print_subject_highlighted<'t>(
+    subject: &str,
+    matches: &Vec<Captures<'t>>,
+) -> Result<(), Error> {
     // Loop over each match in the subject and pretty-print the match as well as
     // any trailing, non-matching text preceding the match.
     let mut last_index = 0;
@@ -68,7 +71,7 @@ pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>)
     for captures in matches.iter() {
         let positions = captures.get(0).unwrap();
 
-        print!("{}", &subject[last_index .. positions.start()]);
+        print!("{}", &subject[last_index..positions.start()]);
         print_match(&subject, captures)?;
 
         last_index = positions.end();
@@ -76,7 +79,7 @@ pub fn print_subject_highlighted<'t>(subject: &str, matches: &Vec<Captures<'t>>)
 
     // Print trailing unmatched text if there is any.
     if last_index < subject.len() {
-        print!("{}", &subject[last_index ..]);
+        print!("{}", &subject[last_index..]);
     }
     println!("");
 
@@ -90,7 +93,11 @@ pub fn print_match_list<'t>(subject: &str, matches: &Vec<Captures<'t>>) -> Resul
     for captures in matches.iter() {
         let positions = captures.get(0).unwrap();
 
-        print!("{:<4} {:<14} ", format!("{}.", match_id), format!("[{}-{}]", positions.start(), positions.end()));
+        print!(
+            "{:<4} {:<14} ",
+            format!("{}.", match_id),
+            format!("[{}-{}]", positions.start(), positions.end())
+        );
         print_match(&subject, captures)?;
         println!("");
         match_id += 1;
@@ -133,14 +140,14 @@ fn print_match(subject: &str, captures: &Captures) -> Result<(), Error> {
     for i in 0..captures.len() {
         let pos = match captures.get(i) {
             None => continue,
-            Some(pos) => pos
+            Some(pos) => pos,
         };
 
         // Unwind the stack until we find the correct parent.
         while !stack.is_empty() && pos.end() > stack.last().unwrap().1 {
             let scope = stack.pop().unwrap();
             terminal.bg(scope.2).unwrap();
-            print!("{}", &subject[string_cursor .. scope.1]);
+            print!("{}", &subject[string_cursor..scope.1]);
             string_cursor = scope.1;
         }
 
@@ -148,7 +155,7 @@ fn print_match(subject: &str, captures: &Captures) -> Result<(), Error> {
         // just before the current capture.
         if !stack.is_empty() {
             terminal.bg(stack.last().unwrap().2).unwrap();
-            print!("{}", &subject[string_cursor .. pos.start()]);
+            print!("{}", &subject[string_cursor..pos.start()]);
             string_cursor = pos.start();
         }
 
@@ -164,7 +171,7 @@ fn print_match(subject: &str, captures: &Captures) -> Result<(), Error> {
     while !stack.is_empty() {
         let scope = stack.pop().unwrap();
         terminal.bg(scope.2).unwrap();
-        print!("{}", &subject[string_cursor .. scope.1]);
+        print!("{}", &subject[string_cursor..scope.1]);
         string_cursor = scope.1;
     }
 
