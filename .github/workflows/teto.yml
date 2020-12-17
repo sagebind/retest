@@ -9,6 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: sagebind/teto@master
+      - uses: sagebind/teto-bot@master
         with:
           token: ${{ secrets.TETO_PAT }}
