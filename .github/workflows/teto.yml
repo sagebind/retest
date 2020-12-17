@@ -1,0 +1,14 @@
+name: teto
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  teto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: sagebind/teto@master
+        with:
+          token: ${{ secrets.TETO_PAT }}
