@@ -7,6 +7,6 @@ jobs:
   teto:
     runs-on: ubuntu-latest
     steps:
-      - uses: sagebind/teto-bot@master
+      - uses: sagebind/teto-bot@v1
         with:
           token: ${{ secrets.TETO_PAT }}
